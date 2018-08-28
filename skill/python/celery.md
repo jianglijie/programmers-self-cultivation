@@ -24,10 +24,9 @@ pip install celery
 
   app = Celery('demo')  # 创建Celery 实例
   app.config_from_object('celery_app.config')  # 通过Celery实例加载配置模块
-
   ```
-
 * 同目录下，使用 `config.py` 文件来配置celery
+
 * ```
   from celery import platforms
   from kombu import Queue, Exchange
@@ -49,7 +48,7 @@ pip install celery
   CELERYD_MAX_TASKS_PER_CHILD = 150  # 每个worker最多执行任务数，防止内存泄露
 
   CELERY_IMPORTS = (  # 指定导入的任务模块
-      'celery_app.{task}',
+      'celery_app.{task_file}',
   )
 
   CELERY_QUEUES = (
@@ -57,12 +56,8 @@ pip install celery
   )
 
   CELERY_ROUTES = {
-      'celery_app.kline.update_kline_okex': {'queue': 'okex_kline', 'routing_key': 'okex_kline'},
-      'celery_app.kline.update_kline_binance': {'queue': 'binance_kline', 'routing_key': 'binance_kline'},
-      'celery_app.kline.update_kline_huobipro': {'queue': 'huobipro_kline', 'routing_key': 'huobipro_kline'},
-      'celery_app.kline.update_kline_bitfinex': {'queue': 'bitfinex_kline', 'routing_key': 'bitfinex_kline'},
+      'celery_app.{task_file}.{task}': {'queue': 'queue1', 'routing_key': 'okex_kline'},
   }
-
   ```
 
 
