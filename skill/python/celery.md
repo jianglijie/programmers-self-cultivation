@@ -60,5 +60,24 @@ pip install celery
   }
   ```
 
+ _以上变量和需要修改的部分用`{}`表示_
+
+#### 运行
+
+```
+celery -A celery_app worker --loglevel=info -Q queue1
+```
+
+
+
+### 各类问题和解决
+
+对于网络搜索得来的部分如上，在自己项目中也有很多需要做修改的部分
+
+* 对于任务结果，项目中不需要关心的话，配置`CELERY_IGNORE_RESULT = True` 来忽略结果
+* 刚开始使用了redis来作为消息中间件，redis中是通过pubsub功能来实现，超过了redis的默认配置，修改redis的pubsub限制解决，因为项目部署中redis做了主从，避免不必要数据的同步，后将消息中间件修改为rabbitmq。
+* 希望设置队列为非持久，使用了网上的代码，修改` CELERY_ROUTES` 里面为 `    'celery_app.{task_file}.{task}': {'queue': 'queue1', 'routing_key': 'queue1',  'delivery_mode': 1},` 结果还是未持久化的队列，同时希望rabbitmq消息不需要ack。搜索无果，阅读celery中的Queue源码，发现在实例化的时候提供了参数的修改，最终的Queue代码为`Queue('queue1', Exchange('default'), routing_key='queue1', durable=False, auto_delete=True,no_ack=True, expires=180, message_ttl=2)`
+* worker启动之后，内存占用过高，按15worker数量，启动一个之后服务器减少内存3，4G，调研发现celery在执行完任务之后并不释放资源，虽然可以通过`CELERYD_MAX_TASKS_PER_CHILD`的配置尽量避免，不过还是觉得占用过高。后面发现默认是用fork多进程的形式运行，修改成gevent模式来运行之后，内存骤降。
+
 
 
