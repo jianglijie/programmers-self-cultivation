@@ -56,7 +56,7 @@ pip install celery
   )
 
   CELERY_ROUTES = {
-      'celery_app.{task_file}.{task}': {'queue': 'queue1', 'routing_key': 'okex_kline'},
+      'celery_app.{task_file}.{task}': {'queue': 'queue1', 'routing_key': 'queue1'},
   }
   ```
 
